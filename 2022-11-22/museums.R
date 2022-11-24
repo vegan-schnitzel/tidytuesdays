@@ -29,6 +29,10 @@ ggplot(open, aes(yr1, csum)) +
     x = "year",
     y = "cumulative sum of open museums"
   ) +
-  theme_minimal(base_family = "raleway")
+  theme_minimal(base_family = "raleway") +
+  theme(
+    plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
+    panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
+  )
 
 ggsave("museums.png", path = "2022-11-22")
