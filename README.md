@@ -1,3 +1,3 @@
-# TidyTuesday
+# #TidyTuesday
 
-Hello, world!
+The weekly TidyTuesday challenge is published [here](https://github.com/rfordatascience/tidytuesday).
