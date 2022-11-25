@@ -17,9 +17,7 @@ open <- museums |>
   filter(yr1 >= 1900) |> 
   arrange(desc(yr1))
 
-open
-
-# plotting
+# cumulative sum ---------------------------------------------------------------
 ggplot(open, aes(yr1, csum)) +
   geom_line(size = 1) +
   labs(
@@ -34,5 +32,26 @@ ggplot(open, aes(yr1, csum)) +
     plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
     panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
   )
-
 ggsave("museums.png", path = "2022-11-22")
+
+# sum of openings per half decade ----------------------------------------------
+open_per_decade <- open |> 
+  # floor opening year to nearest half decade
+  mutate(halfDecade = yr1 - yr1 %% 5) |> 
+  group_by(halfDecade) |> 
+  summarise(n = sum(n))
+
+ggplot(open_per_decade, aes(halfDecade, n)) +
+  geom_col() +
+  labs(
+    title = "Fewer museums are opened in the UK",
+    caption = "Data from museweb.dcs.bbk.ac.uk",
+    x = "5yr intervals",
+    y = "# of openings"
+  ) +
+  theme_minimal(base_family = "raleway") +
+  theme(
+    plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
+    panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
+  )
+ggsave("museums2.png", path = "2022-11-22")
