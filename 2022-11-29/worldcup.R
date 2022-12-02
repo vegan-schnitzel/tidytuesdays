@@ -31,9 +31,13 @@ ggplot(wc, aes(games, goals_scored)) +
     x = "# games",
     y = "# scored goals"
   ) +
-  theme_minimal() +
+  theme_minimal(base_family = "raleway") +
   theme(
     plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
     panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
   )
-ggsave("worldcup.png", path = "2022-11-29")
+ggsave("worldcup.png", path = "2022-11-29",
+       width = 6, units = "in", height = 0.618 * 6, dpi = 300)
+
+# Zusammenfassung der Bedeutung der WM 1954:
+# https://de.wikipedia.org/wiki/Fu%C3%9Fball-Weltmeisterschaft_1954#Fazit
