@@ -1,3 +1,4 @@
+# exclude editor files
 .Rhistory
-.Rproj*
 .Rproj.user
+*.Rproj
