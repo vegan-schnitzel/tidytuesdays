@@ -1,9 +1,12 @@
+# tidytuesday challenge: 22 Nov 2022
+# UK Museums
+
 library(tidyverse)
 
 # load data
 museums <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-22/museums.csv')
 
-# how many museums open per year?
+# how many museums open each year?
 open <- museums |> 
   select(Year_opened) |> 
   separate(col = Year_opened, into = c('yr1', 'yr2'), convert = TRUE) |> 
@@ -12,7 +15,7 @@ open <- museums |>
   # number of opening museums per year
   summarise(n = n()) |>
   # using cumulative sum as index for open museums
-  # this disregards closing of museums
+  # this disregards closing of museums (!)
   mutate(csum = cumsum(n)) |>
   filter(yr1 >= 1900) |> 
   arrange(desc(yr1))
@@ -32,7 +35,7 @@ ggplot(open, aes(yr1, csum)) +
     plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
     panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
   )
-ggsave("museums.png", path = "2022-11-22")
+#ggsave("museums.png", path = "2022/2022-11-22")
 
 # sum of openings per half decade ----------------------------------------------
 open_per_decade <- open |> 
@@ -44,14 +47,15 @@ open_per_decade <- open |>
 ggplot(open_per_decade, aes(halfDecade, n)) +
   geom_col() +
   labs(
-    title = "Fewer museums are opened in the UK",
+    title = "UK Museums",
+    subtitle = "The number of museum openings in the UK in 5-year intervals from 1900 to present.",
     caption = "Data from museweb.dcs.bbk.ac.uk",
-    x = "5yr intervals",
-    y = "# of openings"
+    x = "",
+    y = "museum openings"
   ) +
   theme_minimal(base_family = "raleway") +
   theme(
     plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
     panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
   )
-ggsave("museums2.png", path = "2022-11-22")
+ggsave("museums.png", path = "2022/2022-11-22")

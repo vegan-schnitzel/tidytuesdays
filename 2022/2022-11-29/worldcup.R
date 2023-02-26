@@ -1,3 +1,6 @@
+# tidytuesday challenge: 29 Nov 2022
+# FIFA World Cup history
+
 library(tidyverse)
 library(modelr)
 
@@ -26,17 +29,17 @@ ggplot(wc, aes(games, goals_scored)) +
   # beautification
   labs(
     title = "FIFA World Cup History",
-    subtitle = "The 16 teams of 1954 World Cup in Switzerland were on fire",
+    subtitle = "The 16 teams of 1954 World Cup in Switzerland were on fire!",
     caption = "Data from kaggle.com",
-    x = "# games",
-    y = "# scored goals"
+    x = "# of games",
+    y = "# of scored goals"
   ) +
   theme_minimal(base_family = "raleway") +
   theme(
     plot.background = element_rect(fill = "#fafafa", colour = "#fafafa"),
     panel.background = element_rect(fill = "#fafafa", colour = "#fafafa")
   )
-ggsave("worldcup.png", path = "2022-11-29",
+ggsave("worldcup.png", path = "2022/2022-11-29",
        width = 6, units = "in", height = 0.618 * 6, dpi = 300)
 
 # Zusammenfassung der Bedeutung der WM 1954:
