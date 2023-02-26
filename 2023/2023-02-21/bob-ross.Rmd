@@ -1,0 +1,61 @@
+# TidyTuesday challenge: 21 Feb 2023
+
+Bob Ross paintings
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = "png", fig.width = 6, fig.asp = 0.618, fig.dpi = 300, 
+                      collapse = TRUE, comment = "#>", fig.show = "hold")
+# ggsave() does consider these parameters!
+```
+
+```{r, results="hide"}
+library(tidyverse)
+
+# read data
+paintings <- read_csv(
+  "https://raw.githubusercontent.com/jwilber/Bob_Ross_Paintings/master/data/bob_ross_paintings.csv"
+)
+```
+
+```{r}
+# mean of unique colors per season
+ncolors <- paintings |> 
+  group_by(season) |> 
+  summarise(
+    colors = mean(num_colors),
+    std = sd(num_colors),
+    episodes = max(episode))
+```
+
+```{r}
+ggplot(ncolors, aes(x=season, y=colors)) +
+  geom_errorbar(aes(ymin=colors-std, ymax=colors+std), width=.5, alpha=0.7) +
+  geom_point(size=1, alpha=0.9) +
+  geom_smooth(se = FALSE, color="#00A388") +
+  # beautification
+  labs(
+    title = "Bob Ross Paintings",
+    subtitle = str_wrap("The trend in mean number of painting colors peaks around season #19. Error-bars correspond to +/- 1 standard deviation.", width = 75),
+    caption = "Data from R package {BobRossColors}",
+    x = "season",
+    y = "unique colors"
+  )
+ggsave("bob-ross.png")
+```
+
+```{r}
+maxmincolors <- paintings |> 
+  group_by(season) |> 
+  summarise(
+    max = max(num_colors),
+    min = min(num_colors)
+  )
+```
+
+```{r}
+ggplot(maxmincolors, aes(x=season)) +
+  geom_line(aes(y=max)) +
+  geom_line(aes(y=min))
+```
+
+**ToDo**: It would be nicer to have the data in long-format, i.e., creating one column with max/min values and other (identifier) column with categorical variable corresponding to the type of extreme ("max" or "min").
