@@ -49,13 +49,13 @@ body_font <- "roboto"
 title_font <- "carter"
 ```
 
-```{r, dpi=600}
+```{r}
 # main plot
-ggplot(data = statewide) +
+p <- ggplot(data = statewide) +
   geom_area(aes(year, votes, fill = party), position = "fill") +
   # add state abbreviation
   geom_text(aes(x = mean(range(year)), y = 0.5, label = state_po),
-            family = title_font, color = alpha(bg_col, 0.7), size = 4) +
+            family = title_font, color = alpha(bg_col, 0.7), size = 10) +
   # adjust colours
   scale_fill_manual(
     values = c("Democrat" = blue_col, "Republican" = red_col, "Other" = grey_col)
@@ -64,29 +64,32 @@ ggplot(data = statewide) +
   facet_geo(~ state_po, grid = "us_state_grid2") +
   # labels
   labs(
-    title = "US House Election Results",
+    title = "**US House Election Results**",
     subtitle = glue("Percentage of votes for <span style='color:{blue_col};'>Democrat</span>,
                     <span style='color:{red_col};'>Republican</span>, and
-                    <span style='color:{grey_col};'>Other</span> parties <br>
-                    in general elections between 1976 and 2022."),
+                    <span style='color:{grey_col};'>Other</span> parties in general \n
+                    elections between 1976 and 2022."),
     caption = "**Data**: MIT Election Data and Science Lab",
   ) +
   coord_cartesian(expand = FALSE) +
   theme_void() +
   theme(
     text = element_text(family = body_font), 
-    legend.position = "none",
     strip.text = element_blank(),
-    plot.subtitle = element_markdown(size = 12, lineheight = 1.2, margin = margin(t = 5, b = 5)),
-    plot.caption = element_markdown(),
+    plot.title = element_markdown(size = 40),
+    plot.subtitle = element_markdown(size = 35, margin = margin(t = 5, b = 5)),
+    plot.caption = element_markdown(size = 20),
+    legend.position = "none",
     panel.spacing = unit(0.1, "lines"),
-    plot.margin = margin(0, 15, 5, 5),
+    plot.margin = margin(0, 5, 5, 5),
     plot.background = element_rect(fill = bg_col, colour = bg_col),
     panel.background = element_rect(fill = bg_col, colour = bg_col),
   )
 
-# 463 × 286 px
-#ggsave("us-house-election.png", width = 4.63, height = 2.86, dpi = 400)
-# doesn't work! scaling changes...
+ggsave("us-house-election.png", width = 4.63, height = 2.86, dpi = 400)
+
+#library(ragg)
+#agg_png("test.png", width = 4.63, height = 2.86, units = "in", res = 300)
+#plot(p)
 ```
 
