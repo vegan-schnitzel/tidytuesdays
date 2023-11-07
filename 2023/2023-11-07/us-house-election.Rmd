@@ -1,0 +1,92 @@
+# TidyTuesday challenge: 07 Nov 2023
+
+US House Election Results
+
+Inspiration from N. Rennie:
+https://github.com/nrennie/tidytuesday/tree/main/2023/2023-11-07
+
+```{r}
+library(tidyverse)
+library(showtext) # using non-standard fonts in R graphs
+library(geofacet) # provides geofaceting functionality for ggplot2
+library(ggtext)   # provides simple Markdown and HTML rendering for ggplot2
+library(glue)
+
+house <- read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-07/house.csv'
+)
+```
+
+```{r}
+# data wrangling
+statewide <- house |>
+  # summarise parties
+  mutate(party = case_when(
+    party == "REPUBLICAN" ~ "Republican",
+    party == "DEMOCRAT" ~ "Democrat",
+    TRUE ~ "Other"
+  )) |> 
+  # focus on general elections
+  filter(stage == "GEN") |> 
+  group_by(year, state_po, party) |> 
+  summarise(votes = sum(candidatevotes))
+filter(statewide, state_po == "CA")
+```
+
+```{r}
+# load fonts
+font_add_google("Roboto", "roboto")
+font_add_google("Carter One", "carter")
+showtext_auto()
+
+# define colours & fonts
+blue_col <- "#0015BC"
+red_col <- "#C41E3A"
+grey_col <- "#aaaaaa"
+bg_col <- "white"
+
+body_font <- "roboto"
+title_font <- "carter"
+```
+
+```{r, dpi=600}
+# main plot
+ggplot(data = statewide) +
+  geom_area(aes(year, votes, fill = party), position = "fill") +
+  # add state abbreviation
+  geom_text(aes(x = mean(range(year)), y = 0.5, label = state_po),
+            family = title_font, color = alpha(bg_col, 0.7), size = 4) +
+  # adjust colours
+  scale_fill_manual(
+    values = c("Democrat" = blue_col, "Republican" = red_col, "Other" = grey_col)
+  ) +
+  # geofaceting
+  facet_geo(~ state_po, grid = "us_state_grid2") +
+  # labels
+  labs(
+    title = "US House Election Results",
+    subtitle = glue("Percentage of votes for <span style='color:{blue_col};'>Democrat</span>,
+                    <span style='color:{red_col};'>Republican</span>, and
+                    <span style='color:{grey_col};'>Other</span> parties <br>
+                    in general elections between 1976 and 2022."),
+    caption = "**Data**: MIT Election Data and Science Lab",
+  ) +
+  coord_cartesian(expand = FALSE) +
+  theme_void() +
+  theme(
+    text = element_text(family = body_font), 
+    legend.position = "none",
+    strip.text = element_blank(),
+    plot.subtitle = element_markdown(size = 12, lineheight = 1.2, margin = margin(t = 5, b = 5)),
+    plot.caption = element_markdown(),
+    panel.spacing = unit(0.1, "lines"),
+    plot.margin = margin(0, 15, 5, 5),
+    plot.background = element_rect(fill = bg_col, colour = bg_col),
+    panel.background = element_rect(fill = bg_col, colour = bg_col),
+  )
+
+# 463 × 286 px
+#ggsave("us-house-election.png", width = 4.63, height = 2.86, dpi = 400)
+# doesn't work! scaling changes...
+```
+
