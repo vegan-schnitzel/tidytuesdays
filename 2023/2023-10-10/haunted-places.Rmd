@@ -1,0 +1,36 @@
+# TidyTuesday challenge: 10 Okt 2023
+
+Haunted Places in the United States
+
+```{r}
+# load libraries & data
+library(tidyverse)
+#library(sf)
+library(spData)
+
+places <- read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-10-10/haunted_places.csv'
+)
+```
+```{r}
+# select cemeteries
+cemeteries <- places |>
+  #filter(country == "United States") |> 
+  filter(str_detect(location, "Cemetery")) |>
+  filter(longitude > -140.0 & longitude < -50.0) |> # filter erroneous data
+  select(location, longitude, latitude)
+cemeteries
+```
+
+```{r}
+# create US map
+ggplot() +
+  geom_sf(data = us_states) +
+  geom_point(data = cemeteries, mapping = aes(longitude, latitude), size = 1, alpha = .8) +
+  labs(
+    title = "Haunted Cemeteries in the United States",
+    caption = expression(paste(bold("Data"), ": The Shadowlands Haunted Places Index")),
+  ) +
+  theme_bw()
+ggsave("haunted-cemeteries.png")
+```
