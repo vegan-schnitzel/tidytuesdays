@@ -1,0 +1,128 @@
+# TidyTuesday challenge: 14 Nov 2023
+
+Diwali Sales
+
+```{r}
+library(tidyverse)
+library(ggridges)
+
+diwali <- read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-14/diwali_sales_data.csv'
+  ) |> 
+  rename(Age_Group = "Age Group") |> 
+  drop_na()
+```
+
+```{r}
+summary(diwali)
+```
+
+```{r}
+# number of costumers by age & gender
+ggplot(diwali, aes(x = Age, fill = Gender)) +
+  geom_histogram(binwidth = 5, boundary = 20, alpha = 0.6)
+```
+
+```{r}
+# mean amount spent by age group & gender
+# barplot
+diwali |> 
+  group_by(Gender, Age_Group) |> 
+  summarise(mean = mean(Amount), sd = sd(Amount)) |>
+  ggplot(aes(x = Age_Group, y = mean, fill = Gender)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    geom_errorbar(aes(min = mean-sd, max = mean+sd),
+                  width = .2, position = position_dodge(width = .9))
+
+# box plot
+diwali |> 
+  ggplot(aes(x = Age_Group, y = Amount, fill = Gender)) +
+    geom_boxplot()
+
+# violin plot
+diwali |> 
+  ggplot(aes(x = Age_Group, y = Amount, fill = Gender)) +
+    geom_violin(position = "dodge")
+```
+
+```{r}
+# amount distribution per age group
+# ridgeline
+diwali |> 
+  ggplot(aes(x = Amount, y = Age_Group, fill = Age_Group)) +
+  geom_density_ridges() +
+  theme_ridges() +
+  theme(legend.position = "none")
+
+# boxplot
+diwali |> 
+  ggplot(aes(x = Amount, y = Age_Group, fill = Age_Group)) +
+    geom_boxplot() +
+    theme(legend.position = "none")
+```
+
+```{r}
+# amount distribution per gender and per marital status
+diwali |> 
+  ggplot(aes(x = Amount, y = Gender, fill = Gender)) +
+  geom_density_ridges() +
+  theme_ridges() +
+  theme(legend.position = "none")
+
+diwali |>
+  mutate(Marital_Status = case_match(Marital_Status, 0 ~ "unmarried",
+                                                     1 ~ "married")) |> 
+  ggplot(aes(x = Amount, y = Marital_Status, fill = Marital_Status)) +
+  geom_density_ridges() +
+  theme_ridges() +
+  theme(legend.position = "none")
+```
+
+```{r}
+# amount distribution
+diwali |>
+  mutate(Amount = Amount * 0.01) |> 
+  ggplot(aes(x = Amount)) +
+    geom_histogram(binwidth = 5)
+```
+
+```{r}
+# amount spent per product category
+# ridgeline
+diwali |> 
+  mutate(Amount = Amount * 0.01) |> 
+    ggplot(aes(
+      x = Amount, 
+      y = fct_reorder(Product_Category, Amount, .fun = median), 
+      fill = fct_reorder(Product_Category, Amount, .fun = median),
+    )) +
+    geom_density_ridges(scale = 1.5, stat = "binline", boundary = 0, binwidth = 10) +
+    #geom_density_ridges() +
+    labs(
+      title = "Diwali Sales Data",
+      subtitle = "The pricing system looks funny, doesn't it?",
+      caption = "Data: Kaggle",
+      x = "amount [€]",
+      y = "product category",
+    ) +
+    scale_y_discrete(expand = expand_scale(add = c(.3, 1))) +
+    #theme_bw() +
+    theme_ridges() +
+    theme(legend.position = "none",
+          plot.background = element_rect(fill = "white"),
+          axis.text = element_text(size = 8))
+ggsave("diwali-sales.png")
+
+# boxplot
+diwali |>
+  mutate(Amount = Amount * 0.01) |> 
+    ggplot(aes(
+      x = Amount,
+      y = fct_reorder(Product_Category, Amount, .fun = median),
+      fill = fct_reorder(Product_Category, Amount, .fun = median)
+    )) +
+    geom_boxplot() +
+    theme_bw() +
+    theme(legend.position = "none")
+```
+
