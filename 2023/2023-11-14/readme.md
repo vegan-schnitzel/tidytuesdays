@@ -1,0 +1,1 @@
+![figure](diwali-sales.png)
