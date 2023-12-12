@@ -1,0 +1,33 @@
+```{r}
+library(tidyverse)
+
+drwho <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-11-28/drwho_episodes.csv"
+)
+```
+
+```{r}
+midpoint <- (max(drwho$rating)-min(drwho$rating))/2 + min(drwho$rating)
+print(midpoint)
+
+
+ggplot(drwho, aes(episode_number, season_number, fill = rating)) +
+  geom_tile(na.rm = TRUE, color = "white", size = 1) +
+  #scale_fill_steps2(midpoint = midpoint, n.breaks = 10)
+  scale_fill_gradient2(low = "darkred", mid = "lightgrey", high = "darkblue", midpoint = midpoint) +
+  # change ticks and remove padding
+  scale_y_reverse(expand = c(.005, .005), breaks = seq(1, 13, by = 1)) +
+  scale_x_continuous(expand = c(0.005,0.005), breaks = seq(1, 13, by = 1)) +
+  labs(
+    title = "The Highs and Lows of Doctor Who",
+    caption = "Data: {datardis} package",
+    x = "episode",
+    y = "season"
+  ) +
+  # square plot
+  coord_fixed() +
+  theme_classic()
+
+ggsave("drwho.png", width = 5, height = 4.7)
+```
+
