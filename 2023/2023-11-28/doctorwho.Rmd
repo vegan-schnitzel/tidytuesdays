@@ -30,6 +30,6 @@ ggplot(drwho, aes(episode_number, season_number, fill = rating)) +
   coord_fixed() +
   theme_classic()
 
-ggsave("drwho.png", width = 5, height = 4.7, dpi = 200)
+ggsave("drwho.png", width = 5, height = 4.7, dpi = 300)
 ```
 
