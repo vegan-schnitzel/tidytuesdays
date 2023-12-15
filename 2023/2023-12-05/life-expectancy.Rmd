@@ -1,0 +1,57 @@
+```{r}
+library(tidyverse)
+library(sf)
+library(tmap)
+
+lexp <- readr::read_csv(
+  'https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-12-05/life_expectancy.csv'
+)
+
+sessionInfo()
+```
+
+```{r}
+data("World")
+
+tm_shape(World) +
+  tm_polygons(fill = "HPI", title = "Happy Planet Index")
+  #tm_polygons(fill = "life_exp")
+```
+
+```{r}
+# filter years
+lexp_filter <- lexp |> 
+  filter(Year == 2021 | Year == 1951)
+
+# filter european countries
+europe <- World |> 
+  filter(continent == "Europe") |>
+  drop_na() |> 
+  select(!life_exp) |> 
+  left_join(lexp_filter, by = join_by(iso_a3 == Code)) |> 
+  rename(life_expectancy = LifeExpectancy)
+```
+
+
+```{r}
+# create bounding box
+europe_bb <- st_bbox(
+  World |> 
+  filter(continent == "Europe" &
+         !(name %in% c("Russia", "France", "Norway")))
+)
+
+#tmap_options_reset()
+#tmap_style("cobalt")
+
+map <- tm_shape(europe, is.main = TRUE, bbox = europe_bb, crs = "EPSG:4258") +
+  tm_polygons(fill = "life_expectancy",
+              fill.scale = tm_scale_continuous(),
+              fill.legend = tm_legend(title = "life exp. \n[yr]", item.height = 3)) +
+  tm_facets_wrap(by = "Year", nrow = 1) +
+  tm_layout(inner.margins = c(0.02, 0.01, 0.05, 0)) +
+  tm_title("Comparison of life expectancy in Europe") +
+  tm_credits(text = "Data:\nOur World in Data", position = c(0,0))
+
+tmap_save(tm = map, filename = "lexp.png")
+```
